@@ -115,14 +115,24 @@ public:
    */
   inline G4double Value(const G4double energy, std::size_t& lastidx) const;
 
-  // Get the cross-section/energy-loss value corresponding to the
-  // given energy. An appropriate interpolation is used to calculate
-  // the value. This method should be used if bin location cannot be 
-  // kept in the user code.
+  /**
+   * @brief Get the cross-section/energy-loss value
+   * Get the cross-section/energy-loss value corresponding to the given energy.
+   * An appropriate interpolation is used to calculate the value.
+   * This method should be used if bin location cannot be kept in the user code
+   * @param energy Energy value
+   * @return Interpolated value
+   */
+
   inline G4double Value(const G4double energy) const;
 
-  // Obsolete method to get value, 'isOutRange' is not used anymore.
-  // This method is kept for the compatibility reason
+  /**
+   * @brief Obsolete method to get value
+   * @deprecated Kept for compatibility. isOutRange is not used anymore
+   * @param energy Energy value
+   * @param isOutRange Set if energy is outside the binned range
+   * @return Value
+   */
   inline G4double GetValue(const G4double energy, G4bool& isOutRange) const;
 
   /**
@@ -130,8 +140,9 @@ public:
    * Same as the Value() method above but specialised for log-vector type.
    * Note, unlike the general Value() method above, this method will work properly only for G4PhysicsLogVector.
    * @param energy Energy value
-   * @param theLogEnergy ??
-   * @check Meaning of theLogEnergy parameter
+   * @param theLogEnergy Log of the energy value
+   * @pre theLogEnergy == log(energy)
+   * @pre this is a G4PhysicsLogVector
    * @return Value
    */
   inline G4double LogVectorValue(const G4double energy,
@@ -139,10 +150,11 @@ public:
   /**
    * @brief Get value
    * Same as the Value() method above but specialised for free log-vector type.
+   * Note, unlike the general Value() method above, this method will work properly only for G4PhysicsLogVector. 
    * @param energy Energy value
-   * @param theLogEnergy ??
-   * @check Meaning of theLogEnergy parameter.
-   * @check Does same or similar caveat as previous apply?
+   * @param theLogEnergy Log of the energy value
+   * @pre theLogEnergy == log(energy)
+   * @pre this is a G4PhysicsLogVector
    * @return Value
    */
    inline G4double LogFreeVectorValue(const G4double energy,
@@ -172,15 +184,23 @@ public:
    */
   inline G4double operator()(const std::size_t index) const;
 
-  // Put data into the vector at 'index' position.
-  // Take note that the 'index' starts from '0'.
-  // It is assumed that energies are already filled.
+  /**
+   * @brief Put data into the vector at 'index' position
+   * If index is out of range, a G4 exception is raised
+   * @param index Data index
+   * @param value Value to set
+   * @pre index is in range[0, size)
+   * @pre the energy values have been set
+   * @post If index is in range, the value at idx is set, else a G4 exception is raised
+   */
   inline void PutValue(const std::size_t index, const G4double value);
 
-  // Returns the value in the energy specified by 'index'
-  // of the energy vector. The boundary check will not be done.
-  // Use this when compute cross-section, dEdx, or other value
-  // before filling the vector by PutValue().
+  /**
+   * @brief Returns the energy bin at 'index'
+   * No bounds checking is performed. Use this when compute cross-section, dEdx, or other value before filling the vector using PutValue().
+   * @param index Energy index
+   * @return Energy value
+   */
   inline G4double Energy(const std::size_t index) const;
   /**
    * @brief Returns the low edge energy for the specified index
@@ -217,9 +237,12 @@ public:
    */
   inline std::size_t GetVectorLength() const;
 
-  // Computes the lower index the energy bin in case of log-vector i.e.
-  // in case of vectors with equal bin widths on log-scale
-  // Note, that no check on the boundary is performed
+  /**
+   * @brief Computes energy bin
+   * @param logenergy Log of energy
+   * @pre this is a G4PhysicsLogVector
+   * @return Bin index
+   */
   inline std::size_t ComputeLogVectorBin(const G4double logenergy) const;
 
   /**
@@ -254,31 +277,41 @@ public:
   // be removed with the next major release.
   std::size_t FindBin(const G4double energy, std::size_t idx) const;
 
-  // Scale all values of the vector by factorV, energies by vectorE.
-  // AFter this method FillSecondDerivatives(...) should be called. 
-  // This method may be applied for example after retrieving a vector 
-  // from an external file to convert values into Geant4 units.
+  /**
+   * @brief Scale all values of the vector by factorV, energies by vectorE
+   * @param factorE Energy scale factor
+   * @param factorV Value scale factor
+   */
   void ScaleVector(const G4double factorE, const G4double factorV);
 
-  // This method should be called when the vector is fully filled 
-  // There are 3 types of second derivative computations:
-  //    fSplineSimple -     2d derivative continues
-  //    fSplineBase -       3d derivative continues (the default)
-  //    fSplineFixedEdges - 3d derivatives continues, 1st and last 
-  //                        derivatives are fixed  
-  void FillSecondDerivatives(const G4SplineType = G4SplineType::Base,
+  /**
+   * @brief Fill second derivatives for spline interpolation
+   * There are 3 types of second derivative computations:
+   *  fSplineSimple -     2d derivative continues
+   *  fSplineBase -       3d derivative continues (the default)
+   *  fSplineFixedEdges - 3d derivatives continues, 1st and last derivatives are fixed
+   * @param type Spline type
+   * @param dir1 First point derivative
+   * @param dir2 End point derivative
+   * @pre The vector is fully filled
+   * @post The second derivatives are filled
+   */
+  void FillSecondDerivatives(const G4SplineType type = G4SplineType::Base,
                              const G4double dir1 = 0.0,
                              const G4double dir2 = 0.0);
 
-  // This method may be applied only once.
-  // Force length of data using std::vector::resize() with the
-  // the default value 0; partial cross section vector is resized
-  // only if the number of partial x-sections is above zero.
+// This method may be applied only once.
+// Force length of data using std::vector::resize() with the
+// the default value 0; partial cross section vector is resized
+// only if the number of partial x-sections is above zero. 
   void SetDataLength(G4int dlength);
-    
-  // This method can be applied if both energy and data values 
-  // grow monotonically, for example, if in this vector a 
-  // cumulative probability density function is stored. 
+
+  /**
+   * @brief Get energy for a given value
+   * @param value Value to search for
+   * @pre energy and data for this vector are strictly monotonic increasing (e.g. a cumulative PDF)
+   * @return Energy
+   */
   G4double GetEnergy(const G4double value) const;
 
   /**

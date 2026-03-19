@@ -137,17 +137,14 @@ class G4Physics2DVector
    */
   void PutVectors(const std::vector<G4double>& vecX,
                   const std::vector<G4double>& vecY);
-  // Methods to fill vector
-  // Take note that the 'index' starts from '0'
 
   /**
    * @brief Scale all values of the vector by factor.
+   * This method may be applied for example after Retrieve a vector from an external file to convert values into Geant4 units
+  * 
    * @param factor Scale factor
    */
   void ScaleVector(G4double factor);
-  // Scale all values of the vector by factor.
-  // This method may be applied for example after Retrieve a vector
-  // from an external file to convert values into Geant4 units
 
   /**
    * @brief Find X using linear interpolation for Y-vector filled by cumulative probability.
