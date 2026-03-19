@@ -58,6 +58,7 @@
 #include "G4Transform3D.hh"
 
 /**
+ * @ingroup geometry_management
  * @brief G4AffineTransform is a class for geometric affine transformations.
  * It supports efficient arbitrary rotation & transformation of vectors and
  * the computation of compound & inverse transformations. A 'rotation flag'

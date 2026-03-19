@@ -39,6 +39,10 @@
 #ifndef G4Allocator_hh
 #define G4Allocator_hh 1
 
+/** @ingroup global_management
+ * @{
+ */
+
 #include <cstddef>
 #include <typeinfo>
 
@@ -291,5 +295,8 @@ bool operator!=(const G4Allocator<T1>&, const G4Allocator<T2>&) throw()
 {
   return false;
 }
+
+/**@}*/
+
 
 #endif
