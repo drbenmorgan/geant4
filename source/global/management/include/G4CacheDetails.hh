@@ -72,14 +72,24 @@ template <class T>
 class G4CacheReference
 {
  public:
-  // Initliaze TLS storage
+  /**
+   * @brief Initialize TLS storage
+   * @param id Instance identifier
+   */
   inline void Initialize(unsigned int id);
 
-  // Cleanup TLS storage for instance id. If last==true
-  // destroy and cleanup object container
+  /**
+   * @brief Cleanup TLS storage for instance id. If last==true destroy and cleanup object container
+   * @param id Instance identifier
+   * @param last If true, destroy and cleanup object container
+   */
   inline void Destroy(unsigned int id, G4bool last);
 
-  // Returns cached value for instance id
+  /**
+   * @brief Returns cached value for instance id
+   * @param id Instance identifier
+   * @return Reference to cached value
+   */
   inline T& GetCache(unsigned int id) const;
 
  private:
@@ -100,10 +110,24 @@ template <class T>
 class G4CacheReference<T*>
 {
  public:
+  /**
+   * @brief Initliaze TLS storage
+   * @param id Instance identifier
+   */
   inline void Initialize(unsigned int id);
 
+  /**
+   * @brief Cleanup TLS storage for instance id. If last==true destroy and cleanup object container
+   * @param id Instance identifier
+   * @param last If true, destroy and cleanup object container
+   */
   inline void Destroy(unsigned int id, G4bool last);
 
+  /**
+   * @brief Returns cached pointer for instance id
+   * @param id Instance identifier
+   * @return Reference to cached pointer
+   */
   inline T*& GetCache(unsigned int id) const;
 
  private:
@@ -118,10 +142,24 @@ template <>
 class G4CacheReference<G4double>
 {
  public:
+  /**
+   * @brief Initliaze TLS storage
+   * @param id Instance identifier
+   */
   inline void Initialize(unsigned int id);
 
+  /**
+   * @brief Cleanup TLS storage for instance id. If last==true destroy and cleanup object container
+   * @param id Instance identifier
+   * @param last If true, destroy and cleanup object container
+   */
   inline void Destroy(unsigned int id, G4bool last);
 
+  /**
+   * @brief Returns cached double for instance id
+   * @param id Instance identifier
+   * @return Reference to cached double
+   */
   inline G4double& GetCache(unsigned int id) const;
 
  private:
