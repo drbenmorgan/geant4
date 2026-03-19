@@ -110,6 +110,8 @@ class G4Cache
 
   /**
    * @brief Copy constructor.
+   *
+   * Deep-copy - Copies the content of the cache
    * @param rhs Source cache.
    */
   G4Cache(const G4Cache& rhs);
