@@ -48,3 +48,6 @@ set(CMAKE_MODULE_PATH
 #
 include(G4CMakeMain)
 
+#-----------------------------------------------------------------------
+# - Test of Doxygen
+add_subdirectory(doc)
