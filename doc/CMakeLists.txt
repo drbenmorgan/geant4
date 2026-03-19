@@ -14,6 +14,11 @@ set(PROJECT_VERSION ${${PROJECT_NAME}_VERSION})
 set(DOXYGEN_FULL_PATH_NAMES NO)
 #set(DOXYGEN_PROJECT_LOGO "the current geant4 logo in suitable form")
 
+# Allow autobrief for JavaDoc (/**) and Qt (/*!, //!) comments to
+# reduce need to use special commands like @brief and help readability
+set(DOXYGEN_JAVADOC_AUTOBRIEF YES)
+set(DOXYGEN_QT_AUTOBRIEF YES)
+
 # Build related configuration options
 set(DOXYGEN_SHOW_USED_FILES NO)
 
