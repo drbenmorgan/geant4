@@ -51,29 +51,68 @@
 #include "G4ios.hh"
 #include "globals.hh"
 
+/** @brief Physics vector
+*
+* A physics vector which has values of energy-loss, cross-section,
+* and other physics values of a particle in matter in a given
+* range of energy, momentum, etc.
+* This class serves as the base class for a vector having various
+* energy scale, for example like 'log', 'linear', 'free', etc.
+* @author G.cosmo @author K.Amako @author H.Kurashige
+*/
 class G4PhysicsVector
 {
 public:
-  // Default constructor - vector will be filled via Retrieve() method
-  // Free vector may be filled via InsertValue(..) method
+  /**
+   * @brief Default constructor
+   * Vector should be filled via G4PhysicsVector::Retrieve() method. Free vector may be filled via G4PhysicsVector::InsertValue() instead
+   * @param spline Use spline interpolation
+   */
   explicit G4PhysicsVector(G4bool spline = false);
 
-  // Copy constructor and assignment operator
+  /**
+   * @brief Copy constructor
+   * @param other Source vector
+   */
   G4PhysicsVector(const G4PhysicsVector&) = default;
+
+  /**
+   * @brief Assignment operator
+   * @param other Source vector
+   * @return Reference to this vector
+   */
   G4PhysicsVector& operator=(const G4PhysicsVector&) = default;
 
-  // not used operators
+  /**
+   * @brief Deleted move constructor
+   */
   G4PhysicsVector(const G4PhysicsVector&&) = delete;
+  /**
+   * @brief Deleted move assignment operator
+   */
   G4PhysicsVector& operator=(const G4PhysicsVector&&) = delete;
+  /**
+   * @brief Deleted equality operator
+   */
   G4bool operator==(const G4PhysicsVector& right) const = delete;
+  /**
+   * @brief Deleted inequality operator
+   */
   G4bool operator!=(const G4PhysicsVector& right) const = delete;
 
+  /**
+   * @brief Destructor
+   */
   virtual ~G4PhysicsVector() = default;
 
-  // Get the cross-section/energy-loss value corresponding to the
-  // given energy. An appropriate interpolation is used to calculate
-  // the value. Consumer code gets changed index and may reuse it
-  // for the next call to save CPU for bin location.
+  /**
+   * @brief Get the cross-section/energy-loss value
+   * Get the cross-section/energy-loss value corresponding to the given energy.
+   * An appropriate interpolation is used to calculate the value. The parameter lastidx is updated to contain the bin location where the value was located, which can be reused in a subsequent call - this may avoid having to recompute the bin
+   * @param energy Energy value
+   * @param[inout] lastidx Index (updated for next call)
+   * @return Interpolated value
+   */
   inline G4double Value(const G4double energy, std::size_t& lastidx) const;
 
   // Get the cross-section/energy-loss value corresponding to the
@@ -86,23 +125,51 @@ public:
   // This method is kept for the compatibility reason
   inline G4double GetValue(const G4double energy, G4bool& isOutRange) const;
 
-  // Same as the Value() method above but specialised for log-vector type.
-  // Note, unlike the general Value() method above, this method will work
-  // properly only for G4PhysicsLogVector.
+  /**
+   * @brief Get value
+   * Same as the Value() method above but specialised for log-vector type.
+   * Note, unlike the general Value() method above, this method will work properly only for G4PhysicsLogVector.
+   * @param energy Energy value
+   * @param theLogEnergy ??
+   * @check Meaning of theLogEnergy parameter
+   * @return Value
+   */
   inline G4double LogVectorValue(const G4double energy,
                                  const G4double theLogEnergy) const;
-
-  // Same as the Value() method above but specialised for free vector
-  // with logarithmic seach of bin number
-  inline G4double LogFreeVectorValue(const G4double energy,
+  /**
+   * @brief Get value
+   * Same as the Value() method above but specialised for free log-vector type.
+   * @param energy Energy value
+   * @param theLogEnergy ??
+   * @check Meaning of theLogEnergy parameter.
+   * @check Does same or similar caveat as previous apply?
+   * @return Value
+   */
+   inline G4double LogFreeVectorValue(const G4double energy,
                                      const G4double theLogEnergy) const;
 
-  // Internal method to define bin location
+  /**
+   * @brief Locate bin
+   * Locates the bin for the given energy. lastidx is used as an initial guess for the location. If the energy is out of range, lastidx is set to the min or max edge and the return value is false
+   * @param energy Energy value
+   * @param lastidx Bin location
+   * @return Whether given energy value can/should be interpolated
+   */
   inline G4bool CheckIndex(const G4double energy, std::size_t& lastidx) const;
-  
-  // Returns the value for the specified index of the dataVector
-  // The boundary check will not be done
+
+  /**
+   * @brief Get value
+   * NOTE: does not check if index is in range
+   * @param index Data index
+   * @return Value
+   */
   inline G4double operator[](const std::size_t index) const;
+  /**
+   * @brief Get value
+   * NOTE: does not check if index is in range
+   * @param index Data index
+   * @return Value
+   */
   inline G4double operator()(const std::size_t index) const;
 
   // Put data into the vector at 'index' position.
@@ -115,18 +182,39 @@ public:
   // Use this when compute cross-section, dEdx, or other value
   // before filling the vector by PutValue().
   inline G4double Energy(const std::size_t index) const;
+  /**
+   * @brief Returns the low edge energy for the specified index
+   * @param index Energy index
+   * @return Low edge energy
+   */
   inline G4double GetLowEdgeEnergy(const std::size_t index) const;
 
-  // Returns the energy of the first and the last point of the vector.
+  /**
+   * @brief Returns the energy of the first point of the vector
+   * @return Minimum energy
+   */
   inline G4double GetMinEnergy() const;
+  /**
+   * @brief Returns the energy of the last point of the vector
+   * @return Maximum energy
+   */
   inline G4double GetMaxEnergy() const;
 
-  // Returns the data of the first and the last point of the vector.
-  // If the vector is empty returns zeros.
+  /**
+   * @brief Returns the data of the first point of the vector
+   * @return Minimum value
+   */
   inline G4double GetMinValue() const;
+  /**
+   * @brief Returns the data of the last point of the vector
+   * @return Maximum value
+   */
   inline G4double GetMaxValue() const;
 
-  // Get the total length of the vector
+  /**
+   * @brief Get the total length of the vector
+   * @return Vector length
+   */
   inline std::size_t GetVectorLength() const;
 
   // Computes the lower index the energy bin in case of log-vector i.e.
@@ -134,18 +222,31 @@ public:
   // Note, that no check on the boundary is performed
   inline std::size_t ComputeLogVectorBin(const G4double logenergy) const;
 
-  // Get physics vector type.
+  /**
+   * @brief Get physics vector type tag
+   * @return Physics vector type
+   */
   inline G4PhysicsVectorType GetType() const;
 
-  // True if using spline interpolation.
+  /**
+   * @brief True if using spline interpolation
+   * @return Spline flag
+   */
   inline G4bool GetSpline() const;
 
-  // Define verbosity level.
+  /**
+   * @brief Define verbosity level
+   * @param value Verbosity level
+   */
   inline void SetVerboseLevel(G4int value);
 
-  // Find energy using linear interpolation for vector
-  // filled by cumulative probability function.
-  // Assuming that vector is already filled.
+  /**
+   * @brief Find energy using linear interpolation for vector filled by cumulative probability function
+   * @param rand Random value
+   * @deprecated Possibly deprecated, used once
+   * @check Consider deprecation
+   * @return Interpolated energy
+   */
   inline G4double FindLinearEnergy(const G4double rand) const;
 
   // Find low edge index of a bin for given energy.
@@ -180,12 +281,34 @@ public:
   // cumulative probability density function is stored. 
   G4double GetEnergy(const G4double value) const;
 
-  // To store/retrieve persistent data to/from file streams.
+  /**
+   * @brief Store persistent data to file stream
+   * @param fOut Output file stream
+   * @param ascii Store as ASCII if true
+   * @return Success flag
+   */
   G4bool Store(std::ofstream& fOut, G4bool ascii = false) const;
+  /**
+   * @brief Retrieve persistent data from file stream
+   * @param fIn Input file stream
+   * @param ascii Retrieve as ASCII if true
+   * @return Success flag
+   */
   G4bool Retrieve(std::ifstream& fIn, G4bool ascii = false);
 
-  // Print vector
-  friend std::ostream& operator<<(std::ostream&, const G4PhysicsVector&);
+  /**
+   * @brief Print vector to stream
+   * @param os Output stream
+   * @param vec Vector to print
+   * @return Output stream
+   */
+  friend std::ostream& operator<<(std::ostream& os, const G4PhysicsVector& vec);
+
+  /**
+   * @brief Print vector values
+   * @param unitE Energy unit
+   * @param unitV Value unit
+   */
   void DumpValues(G4double unitE = 1.0, G4double unitV = 1.0) const;
 
 protected:
