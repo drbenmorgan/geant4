@@ -1,0 +1,32 @@
+/**
+ *
+ * @defgroup geant4 geant4
+ *   The code for the Geant4 toolkit.
+ *
+ *   Geant4's code is organised into a series of _categories_ that contain the
+ *   code for specific capabilities.
+ *
+ *
+ * 
+ *   @defgroup global global
+ *     @ingroup geant4
+ *     This is the global category
+ *   @defgroup global_management management
+ *     @ingroup global
+ *     This is the management subcategory of the global category
+ *
+ *     @todo How to name nested groups (arguments to defgroup)?
+ *
+ *
+ *   @defgroup geometry geometry
+ *     @ingroup geant4
+ *     Top level category for Geant4's geometry modeling and navigation code.
+ *     
+ *     More detailed documentation can go here.
+ *
+ *     @sa global_management
+ *
+ *     @defgroup geometry_management management
+ *       @ingroup geometry
+ *       This is the management subcategory of the geometry category
+ **/

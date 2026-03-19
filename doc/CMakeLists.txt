@@ -22,6 +22,7 @@ set(DOXYGEN_FILE_PATTERNS
   "*.hh"
   "*.icc"
   "*.md"
+  "*.dox"
 )
 set(DOXYGEN_EXTENSION_MAPPING "icc=C++")
 set(DOXYGEN_EXCLUDE_PATTERNS "*/test/*")
@@ -47,6 +48,7 @@ set(DOXYGEN_VERBATIM_VARS DOXYGEN_ALIASES)
 
 # Call CMake function from FindDoxygen to generate
 doxygen_add_docs(doc
+  "${CMAKE_CURRENT_SOURCE_DIR}/groups.dox"
   "${PROJECT_SOURCE_DIR}/source/global/management"
   "${PROJECT_SOURCE_DIR}/source/geometry/management"
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
