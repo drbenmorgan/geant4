@@ -82,8 +82,9 @@
 #include "G4AutoLock.hh"
 #include "G4CacheDetails.hh"  // Thread Local storage details are here
 
-// A templated cache to store a thread-private data of type VALTYPE.
-//
+/** 
+* @brief A templated cache to store thread-private data of type VALTYPE
+ */
 template <class T>
 class G4Cache
 {
@@ -91,28 +92,58 @@ class G4Cache
   using value_type = T;
 
  public:
-  // Default constructor
+  /**
+   * @brief Default constructor.
+   */
   G4Cache();
 
-  // Construct cache object with initial value
+  /**
+   * @brief Construct cache object with initial value.
+   * @param v Initial value.
+   */
   G4Cache(const value_type& v);
 
-  // Default destructor
+  /**
+   * @brief Default destructor.
+   */
   virtual ~G4Cache();
 
+  /**
+   * @brief Copy constructor.
+   * @param rhs Source cache.
+   */
   G4Cache(const G4Cache& rhs);
+
+  /**
+   * @brief Assignment operator.
+   * @param rhs Source cache.
+   * @return Reference to this cache.
+   */
   G4Cache& operator=(const G4Cache& rhs);
 
-  // Gets reference to cached value of this threads
+  /**
+   * @brief Gets reference to cached value of this thread.
+   * @return Reference to cached value.
+   */
   inline value_type& Get() const;
 
-  // Sets this thread cached value to val
+  /**
+   * @brief Sets this thread's cached value.
+   * @param val Value to set.
+   */
   inline void Put(const value_type& val) const;
 
-  // Gets copy of cached value
+  /**
+   * @brief Gets copy of cached value.
+   * @return Copy of cached value.
+   */
   inline value_type Pop();
 
  protected:
+  /**
+   * @brief Gets cache ID.
+   * @return Cache ID.
+   */
   const G4int& GetId() const { return id; }
 
  private:
@@ -121,6 +152,10 @@ class G4Cache
   inline static std::atomic<unsigned int> instancesctr{0};
   inline static std::atomic<unsigned int> dstrctr{0};
 
+  /**
+   * @brief Gets thread-local cache reference.
+   * @return Reference to thread-local cache.
+   */
   inline value_type& GetCache() const
   {
     theCache.Initialize(id);
@@ -128,9 +163,11 @@ class G4Cache
   }
 };
 
-// A vector version of the cache. Implements vector interface.
-// Can be used directly as a std::vector would be used.
-//
+/**
+ * @class G4VectorCache
+ * @brief Vector version of thread-private cache.
+ * @tparam T Type of vector element.
+ */
 template <class T>
 class G4VectorCache : public G4Cache<std::vector<T>>
 {
@@ -142,33 +179,81 @@ class G4VectorCache : public G4Cache<std::vector<T>>
   using const_iterator = typename vector_type::const_iterator;
 
  public:
-  // Default constructor
+  /**
+   * @brief Default constructor.
+   */
   G4VectorCache() = default;
 
-  // Creates a vector cache of nElems elements
+  /**
+   * @brief Creates a vector cache of nElems elements.
+   * @param nElems Number of elements.
+   */
   G4VectorCache(G4int nElems);
 
-  // Creates a vector cache with elements from an array
+  /**
+   * @brief Creates a vector cache with elements from an array.
+   * @param nElems Number of elements.
+   * @param vals Array of values.
+   */
   G4VectorCache(G4int nElems, value_type* vals);
 
-  // Default destructor
+  /**
+   * @brief Default destructor.
+   */
   virtual ~G4VectorCache() = default;
 
-  // Interface with functionalities of similar name of std::vector
+  /**
+   * @brief Adds an element to the vector cache.
+   * @param val Value to add.
+   */
   inline void Push_back(const value_type& val);
+
+  /**
+   * @brief Removes and returns the last element.
+   * @return Last element.
+   */
   inline value_type Pop_back();
+
+  /**
+   * @brief Access element by index.
+   * @param idx Index.
+   * @return Reference to element.
+   */
   inline value_type& operator[](const G4int& idx);
+
+  /**
+   * @brief Returns iterator to beginning.
+   * @return Iterator.
+   */
   inline iterator Begin();
+
+  /**
+   * @brief Returns iterator to end.
+   * @return Iterator.
+   */
   inline iterator End();
+
+  /**
+   * @brief Clears the vector cache.
+   */
   inline void Clear();
+  /**
+   * @brief Returns size of vector cache.
+   * @return Size.
+   */
   inline size_type Size() { return G4Cache<vector_type>::Get().size(); }
   //  Needs to be here for a VC9 compilation problem
 };
 
-// a Map version of the cache. Implements std::map interface.
-// Can be used directly as a std::map would be used.
-// Key being the key type and T the value type.
-//
+/**
+ * @class G4MapCache
+ * @brief Map version of thread-private cache.
+ *
+ * Implements std::map interface so can be used directly as a std::map would be used.
+ *
+ * @tparam Key Type of key.
+ * @tparam T Type of value.
+ */
 template <class Key, class T>
 class G4MapCache : public G4Cache<std::map<Key, T>>
 {
@@ -181,25 +266,78 @@ class G4MapCache : public G4Cache<std::map<Key, T>>
   using const_iterator = typename map_type::const_iterator;
 
  public:
-  // Default destructor
+  /**
+   * @brief Default destructor.
+   */
   virtual ~G4MapCache() = default;
 
-  // Returns true if map contains element corresponding to key k
+  /**
+   * @brief Returns true if map contains element corresponding to key.
+   * @param k Key.
+   * @return True if key exists.
+   */
   inline G4bool Has(const key_type& k);
 
-  // Interface with functionalities of similar name of std::map
-  inline std::pair<iterator, G4bool> Insert(const key_type& k,
-                                            const value_type& v);
+  /**
+   * @brief Inserts a key-value pair.
+   * @param k Key.
+   * @param v Value.
+   * @return Pair of iterator and bool.
+   */
+  inline std::pair<iterator, G4bool> Insert(const key_type& k, const value_type& v);
+
+  /**
+   * @brief Returns iterator to beginning.
+   * @return Iterator.
+   */
   inline iterator Begin();
+
+  /**
+   * @brief Returns iterator to end.
+   * @return Iterator.
+   */
   inline iterator End();
+
+  /**
+   * @brief Finds element by key.
+   * @param k Key.
+   * @return Iterator.
+   */
   inline iterator Find(const key_type& k);
+
+  /**
+   * @brief Gets value by key.
+   * @param k Key.
+   * @return Reference to value.
+   */
   inline value_type& Get(const key_type& k);
+
+  /**
+   * @brief Erases element by key.
+   * @param k Key.
+   * @return Number of elements erased.
+   */
   inline size_type Erase(const key_type& k);
+
+  /**
+   * @brief Access value by key.
+   * @param k Key.
+   * @return Reference to value.
+   */
   inline value_type& operator[](const key_type& k);
+  /**
+   * @brief Returns size of map cache.
+   * @return Size.
+   */
   inline size_type Size() { return G4Cache<map_type>::Get().size(); }
   //  Needs to be here for a VC9 compilation problem
 };
 
+/**
+ * @class G4Cache
+ * @brief Thread-private cache for storing a thread-local variable.
+ * @tparam T Type of the cached value.
+ */
 //========= Implementation: G4Cache<T> ====================================
 
 template <class T>
