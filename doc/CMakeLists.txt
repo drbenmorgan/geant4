@@ -40,6 +40,11 @@ set(DOXYGEN_GENERATE_LATEX NO)
 set(DOXYGEN_EXTRACT_ALL NO)
 set(DOXYGEN_SOURCE_BROWSER YES)
 
+set(DOXYGEN_ALIASES
+    [[check="@xrefitem check \"CHECK\" \"To be checked\""]]
+)
+set(DOXYGEN_VERBATIM_VARS DOXYGEN_ALIASES)
+
 # Call CMake function from FindDoxygen to generate
 doxygen_add_docs(doc
   "${PROJECT_SOURCE_DIR}/source/global/management"
