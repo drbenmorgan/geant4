@@ -28,6 +28,9 @@
 
 #include "G4PhysicsFreeVector.hh"
 
+/**
+@deprecated No class, just a using
+*/
 using G4PhysicsOrderedFreeVector = G4PhysicsFreeVector;
 
 #endif

@@ -44,15 +44,25 @@
 #include "G4PhysicsVector.hh"
 #include "globals.hh"
 
+/** @brief Physics vector specialised for linear bin spacing
+*/
 class G4PhysicsLinearVector : public G4PhysicsVector
 {
 public:
-  // The vector will be filled from external file using Retrieve() method
+  /** @brief Create an empty linear-binned vector */
   explicit G4PhysicsLinearVector(G4bool spline = false);
 
-  // Energies will be computed and filled at construction, values will be 
-  // filled with zeros. Required Nbin > 0 and Emax > Emin.
-  // Use PutValue(..) to fill the data vector
+  /** @brief Create a zero-valued linear vector
+  *
+  * Energy bins are initialised to cover the range [Emin, EMax] using Nbin bins. 
+  * @param Emin Minimum energy bin edge
+  * @param Emax Maximum energy bin edge
+  * @param Nbin Number of bins
+  * @pre Nbin > 0
+  * @pre Emax > Emin
+  * @post Energy bins are created and corresponding values are initialised to zero
+  * @param spline Whether to use splined interpolation
+   */
   explicit G4PhysicsLinearVector(G4double Emin, G4double Emax, std::size_t Nbin,
                                  G4bool spline = false);
 
