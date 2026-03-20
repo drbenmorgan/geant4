@@ -22,32 +22,21 @@
 // * use  in  resulting  scientific  publications,  and indicate your *
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
-//
-// G4Allocator
-//
-// Class Description:
-//
-// A class for fast allocation of objects to the heap through a pool of
-// chunks organised as linked list. It's meant to be used by associating
-// it to the object to be allocated and defining for it new and delete
-// operators via MallocSingle() and FreeSingle() methods.
-
-//      ---------------- G4Allocator ----------------
-//
+//! @file G4Allocator.hh
+// ********************************************************************
 // Author: G.Cosmo (CERN), November 2000
 // --------------------------------------------------------------------
 #ifndef G4Allocator_hh
 #define G4Allocator_hh 1
-
-/** @ingroup global_management
- * @{
- */
 
 #include <cstddef>
 #include <typeinfo>
 
 #include "G4AllocatorPool.hh"
 
+/**
+ * Abstract base class for type-erasure in G4Allocator
+ */
 class G4AllocatorBase
 {
  public:
@@ -61,6 +50,14 @@ class G4AllocatorBase
   virtual const char* GetPoolType() const        = 0;
 };
 
+/**
+ * @ingroup global_management
+ * Efficient pool-based allocator for heap objects.
+ * 
+ * It's meant to be used by associating it to the object to be 
+ * allocated and using it to implement `new` and `delete` using the
+ * MallocSingle and FreeSingle methods.
+ */
 template <class Type>
 class G4Allocator : public G4AllocatorBase
 {
@@ -69,26 +66,34 @@ class G4Allocator : public G4AllocatorBase
   ~G4Allocator() throw() override;
   // Constructor & destructor
 
+  //!Allocate and return a single instance of Type.
   inline Type* MallocSingle();
+
+  //! Free memory occupied by passed pointer.
   inline void FreeSingle(Type* anElement);
-  // Malloc and Free methods to be used when overloading
-  // new and delete operators in the client <Type> object
 
+  /** Return allocated storage to free store.
+   *
+   * @post Any pointers to memory allocated by MallocSingle will be
+   * invalid.
+   * @post Allocator is reset. 
+   */
   inline void ResetStorage() override;
-  // Returns allocated storage to the free store, resets allocator.
-  // Note: contents in memory are lost using this call !
 
+  //! Returns the size of the total memory allocated
   inline std::size_t GetAllocatedSize() const override;
-  // Returns the size of the total memory allocated
+  
+  //! Returns the total number of allocated pages
   inline int GetNoPages() const override;
-  // Returns the total number of allocated pages
+  
+  //! Returns the current size of a page
   inline std::size_t GetPageSize() const override;
-  // Returns the current size of a page
+  
+  //! Resets allocator and increases default page size of a given factor
   inline void IncreasePageSize(unsigned int sz) override;
-  // Resets allocator and increases default page size of a given factor
 
+  //! Returns the type_info Id of the allocated type in the pool
   inline const char* GetPoolType() const override;
-  // Returns the type_info Id of the allocated type in the pool
 
   // This public section includes standard methods and types
   // required if the allocator is to be used as alternative
@@ -295,8 +300,5 @@ bool operator!=(const G4Allocator<T1>&, const G4Allocator<T2>&) throw()
 {
   return false;
 }
-
-/**@}*/
-
 
 #endif
