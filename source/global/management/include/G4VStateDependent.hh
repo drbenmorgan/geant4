@@ -22,16 +22,8 @@
 // * use  in  resulting  scientific  publications,  and indicate your *
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
-//
-// G4VStateDependent
-//
-// Class description:
-//
-// Abstract base class of all classes which need to be notified when
-// the state of Geant4 changes. The concrete class object derived from
-// this base class will be automatically registered to G4StateManager
-// and the virtual method Notify() will be invoked when the state changes.
-
+//! @file G4VStateDependent.hh
+// ********************************************************************
 // Authors: G.Cosmo, M.Asai - November 1996
 // --------------------------------------------------------------------
 #ifndef G4VStateDependent_hh
@@ -43,6 +35,17 @@
 class G4Event;
 class G4Run;
 
+/**
+ * @ingroup global_management
+ * Abstract base class of all classes which need to be notified when
+ * the state of Geant4 changes. 
+ * 
+ * Concrete class objects derived from this base class will be automatically 
+ * registered to G4StateManager on construction, and deregistered on deletion.
+ * The virtual method Notify() will be invoked by G4StateManager when the state changes.
+ * 
+ * @sa G4StateManager
+ */
 class G4VStateDependent
 {
  public:
@@ -51,12 +54,15 @@ class G4VStateDependent
   G4bool operator==(const G4VStateDependent& right) const;
   G4bool operator!=(const G4VStateDependent& right) const;
 
+  /**
+   * Pure virtual method which will be invoked by G4StateManager.
+   * 
+   * In case a state change must not be allowed by some reason of the
+   * concrete class, false should be returned. But this scheme use is
+   * NOT recommended. All commands which are state sensitive MUST assign
+   * available state(s).
+   */
   virtual G4bool Notify(G4ApplicationState requestedState) = 0;
-  // Pure virtual method which will be invoked by G4StateManager.
-  // In case a state change must not be allowed by some reason of the
-  // concrete class, false should be returned. But this scheme use is
-  // NOT recommended. All commands which are state sensitive MUST assign
-  // available state(s).
 
   virtual void NotifyDeletion(const G4Event*) {}
   virtual void NotifyDeletion(const G4Run*) {}
