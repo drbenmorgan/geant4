@@ -22,18 +22,8 @@
 // * use  in  resulting  scientific  publications,  and indicate your *
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
-//
-// G4StateManager
-//
-// Class description:
-//
-// Class responsible for handling and updating the running state
-// of the Geant4 application during its different phases.
-// The class is a singleton, it can be accessed via the public
-// method G4StateManager::GetStateManager().
-//
-// States of Geant4 are defined in G4ApplicationState.
-
+//! @file G4StateManager.hh
+// ********************************************************************
 // Authors: G.Cosmo, M.Asai - November 1996
 // --------------------------------------------------------------------
 #ifndef G4StateManager_hh
@@ -49,13 +39,25 @@
 class G4Run;
 class G4Event;
 
+/**
+ * @ingroup global_management
+ * Handles and updates the running Geant4 application state.
+ * 
+ * The class is a singleton, it can be accessed via the public
+ * method G4StateManager::GetStateManager().
+ * 
+ * @check Document use of G4VStateDependent and G4VExceptionHandler.
+ *  
+ * @sa G4ApplicationState for possible states.
+ */
 class G4StateManager
 {
  public:
+  /** Returns the instance on the callee's thread.
+   * 
+   * @post Returned pointer is not null.
+   */
   static G4StateManager* GetStateManager();
-  // The G4StateManager class is a singleton class and the pointer
-  // to the only one existing object can be obtained by this static
-  // method.
 
   ~G4StateManager();
 
@@ -64,44 +66,78 @@ class G4StateManager
   G4bool operator==(const G4StateManager&) const   = delete;
   G4bool operator!=(const G4StateManager&) const   = delete;
 
+  //! Returns the current state
   const G4ApplicationState& GetCurrentState() const;
-  // Returns the current state
+  
+  //! Returns the previous state
   const G4ApplicationState& GetPreviousState() const;
-  // Returns the previous state
+
+  /**
+   * Set Geant4 to a new state.
+   * 
+   * In case the request is illegal, false will be returned
+   * and the state of Geant4 will not be changed.
+   */
   G4bool SetNewState(const G4ApplicationState& requestedState);
-  // Set Geant4 to a new state.
-  // In case the request is illegal, false will be returned
-  // and the state of Geant4 will not be changed
+
+  /**
+   * Set Geant4 to a new state.
+   *
+   * In case the request is illegal, false will be returned
+   * and the state of Geant4 will not be changed.
+   * "msg" is the information associated to the state change
+   */
   G4bool SetNewState(const G4ApplicationState& requestedState, const char* msg);
-  // Set Geant4 to a new state.
-  // In case the request is illegal, false will be returned
-  // and the state of Geant4 will not be changed.
-  // "msg" is the information associated to the state change
+
+  /** 
+   * Register a concrete class of G4VStateDependent.
+   * Registered concrete classes will be notified via
+   * G4VStateDependent::Notify() method when the state of Geant4 changes.
+   * 
+   * @return `true` if registration successful.
+   */
   G4bool RegisterDependent(G4VStateDependent* aDependent,
                            G4bool bottom = false);
-  // Register a concrete class of G4VStateDependent.
-  // Registered concrete classes will be notified via
-  // G4VStateDependent::Notify() method when the state of Geant4 changes.
-  // False will be returned if registration fails
-  G4bool DeregisterDependent(G4VStateDependent* aDependent);
-  // Remove the registration.
-  // False will be returned if aDependent has not been registered
-  G4VStateDependent* RemoveDependent(const G4VStateDependent* aDependent);
-  // Remove the registration.
-  // Removed pointer is returned
-  G4String GetStateString(const G4ApplicationState& aState) const;
-  // Utility method which returns a string of the state name
 
+  /**
+   * Remove the registration.
+   * 
+   * @return `false` if @p aDependent is not already registered.
+   */
+  G4bool DeregisterDependent(G4VStateDependent* aDependent);
+
+  /** Remove the registration.
+   *
+   * Removed pointer is returned
+   */
+  G4VStateDependent* RemoveDependent(const G4VStateDependent* aDependent);
+  
+  //! Return string of the state name
+  G4String GetStateString(const G4ApplicationState& aState) const;
+
+  /**
+   * Notify observers of event deletion.
+   */
   void NotifyDeletion(const G4Event*);
+
+  /**
+   * Notify observers of run deletion.
+   * 
+   * Notifying when an event or a run is deleted for the sake of avoiding
+   * a state-dependent class from accessing to an obsolete event/run object.
+   */
   void NotifyDeletion(const G4Run*);
-  // Notifying when an event or a run is deleted for the sake of avoiding
-  // a state-dependent class from accessing to an obsolete event/run object.
 
   inline void SetSuppressAbortion(G4int i);
   inline G4int GetSuppressAbortion() const;
   inline const char* GetMessage() const;
+
+  //! Install handler for G4Exception. 
   inline void SetExceptionHandler(G4VExceptionHandler* eh);
+
+  //! Return pointer to installed handler for G4Exception.
   inline G4VExceptionHandler* GetExceptionHandler() const;
+
   static void SetVerboseLevel(G4int val);
 
  private:
