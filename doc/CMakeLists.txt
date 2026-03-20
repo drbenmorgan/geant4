@@ -46,6 +46,11 @@ set(DOXYGEN_ALIASES
 )
 set(DOXYGEN_VERBATIM_VARS DOXYGEN_ALIASES)
 
+# Using a custom Mainpage layout
+set(DOXYGEN_LAYOUT_FILE CustomLayout.xml)
+configure_file(CustomLayout.xml CustomLayout.xml)
+
+
 # Call CMake function from FindDoxygen to generate
 doxygen_add_docs(doc
   "${CMAKE_CURRENT_SOURCE_DIR}/groups.dox"
