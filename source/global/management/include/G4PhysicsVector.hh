@@ -65,6 +65,7 @@ class G4PhysicsVector
 public:
   /**
    * @brief Default constructor
+   *
    * Vector should be filled via G4PhysicsVector::Retrieve() method. Free vector may be filled via G4PhysicsVector::InsertValue() instead
    * @param spline Use spline interpolation
    */
@@ -107,6 +108,7 @@ public:
 
   /**
    * @brief Get the cross-section/energy-loss value
+   *
    * Get the cross-section/energy-loss value corresponding to the given energy.
    * An appropriate interpolation is used to calculate the value. The parameter lastidx is updated to contain the bin location where the value was located, which can be reused in a subsequent call - this may avoid having to recompute the bin
    * @param energy Energy value
@@ -117,6 +119,7 @@ public:
 
   /**
    * @brief Get the cross-section/energy-loss value
+   *
    * Get the cross-section/energy-loss value corresponding to the given energy.
    * An appropriate interpolation is used to calculate the value.
    * This method should be used if bin location cannot be kept in the user code
@@ -137,6 +140,7 @@ public:
 
   /**
    * @brief Get value
+   *
    * Same as the Value() method above but specialised for log-vector type.
    * Note, unlike the general Value() method above, this method will work properly only for G4PhysicsLogVector.
    * @param energy Energy value
@@ -149,6 +153,7 @@ public:
                                  const G4double theLogEnergy) const;
   /**
    * @brief Get value
+   *
    * Same as the Value() method above but specialised for free log-vector type.
    * Note, unlike the general Value() method above, this method will work properly only for G4PhysicsLogVector. 
    * @param energy Energy value
@@ -162,6 +167,7 @@ public:
 
   /**
    * @brief Locate bin
+   *
    * Locates the bin for the given energy. lastidx is used as an initial guess for the location. If the energy is out of range, lastidx is set to the min or max edge and the return value is false
    * @param energy Energy value
    * @param lastidx Bin location
@@ -171,6 +177,7 @@ public:
 
   /**
    * @brief Get value
+   *
    * NOTE: does not check if index is in range
    * @param index Data index
    * @return Value
@@ -186,6 +193,7 @@ public:
 
   /**
    * @brief Put data into the vector at 'index' position
+   *
    * If index is out of range, a G4 exception is raised
    * @param index Data index
    * @param value Value to set
@@ -197,6 +205,7 @@ public:
 
   /**
    * @brief Returns the energy bin at 'index'
+   *
    * No bounds checking is performed. Use this when compute cross-section, dEdx, or other value before filling the vector using PutValue().
    * @param index Energy index
    * @return Energy value
@@ -272,9 +281,13 @@ public:
    */
   inline G4double FindLinearEnergy(const G4double rand) const;
 
-  // Find low edge index of a bin for given energy.
-  // Min value 0, max value idxmax. This method is obsolete and will
-  // be removed with the next major release.
+  /**
+   * @brief Find low edge index of a bin for given energy (obsolete)
+   * @param energy Energy value
+   * @param idx Starting index
+   * @deprecated 
+   * @return Bin index
+   */
   std::size_t FindBin(const G4double energy, std::size_t idx) const;
 
   /**
@@ -286,6 +299,7 @@ public:
 
   /**
    * @brief Fill second derivatives for spline interpolation
+   *
    * There are 3 types of second derivative computations:
    *  fSplineSimple -     2d derivative continues
    *  fSplineBase -       3d derivative continues (the default)
@@ -371,17 +385,17 @@ private:
 
 protected:
 
-  G4double edgeMin = 0.0;  // Energy of first point
-  G4double edgeMax = 0.0;  // Energy of the last point
+  G4double edgeMin = 0.0;  /**< Energy of first point*/
+  G4double edgeMax = 0.0;  /**< Energy of the last point*/
 
-  G4double invdBin = 0.0;  // 1/Bin width for linear and log vectors
-  G4double logemin = 0.0;  // used only for log vector
+  G4double invdBin = 0.0;  /**< 1/Bin width for linear and log vectors*/
+  G4double logemin = 0.0;  /**< used only for log vector*/
 
-  G4double iBin1 = 0.0;  // 1/Bin width for scale log vector
-  G4double lmin1 = 0.0;  // used for log search of free vector
+  G4double iBin1 = 0.0;  /**< 1/Bin width for scale log vector */
+  G4double lmin1 = 0.0;  /**< used for log search of free vector */
 
   G4int verboseLevel = 0;
-  std::size_t idxmax = 0;
+  std::size_t idxmax = 0; /**< Maximum index value (@check for spline interpolation is this reduced? */
   std::size_t imax1 = 0;
   std::size_t numberOfNodes = 0;
   std::size_t nLogNodes = 0;
@@ -389,9 +403,9 @@ protected:
   G4PhysicsVectorType type = T_G4PhysicsFreeVector;
   // The type of PhysicsVector (enumerator)
 
-  std::vector<G4double> binVector;      // energy
-  std::vector<G4double> dataVector;     // crossection/energyloss
-  std::vector<G4double> secDerivative;  // second derivatives
+  std::vector<G4double> binVector;      /**< energy bins */
+  std::vector<G4double> dataVector;     /**< crossection/energyloss values */
+  std::vector<G4double> secDerivative;  /**< second derivatives */
   std::vector<std::size_t> scale;       // log seach
 
 private:
