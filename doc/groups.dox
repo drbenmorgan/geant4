@@ -6,7 +6,9 @@
  *   Geant4's code is organised into a series of _categories_ that contain the
  *   code for specific capabilities.
  *
- *
+ *   @defgroup event event
+ *     @ingroup geant4
+ *     This is the event category.
  * 
  *   @defgroup global global
  *     @ingroup geant4
